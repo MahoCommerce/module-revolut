@@ -51,8 +51,28 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <comment><![CDATA[The Revolut Merchant dashboard has no Webhooks UI &mdash; create one via API. Run <code>curl -X POST https://sandbox-merchant.revolut.com/api/1.0/webhooks -H "Authorization: Bearer &lt;sk_...&gt;" -H "Revolut-Api-Version: 2024-09-01" -H "Content-Type: application/json" -d '{"url":"https://&lt;your-store&gt;/revolut/webhook","events":["ORDER_COMPLETED","ORDER_AUTHORISED","ORDER_PAYMENT_DECLINED","ORDER_PAYMENT_FAILED"]}'</code> (swap host to <code>merchant.revolut.com</code> for production). Copy the <code>signing_secret</code> from the response &mdash; it is returned only once.]]></comment>
+                            <comment>Populated automatically by the "Register Webhook" button below. Used to verify incoming webhook signatures.</comment>
                         </webhook_secret>
+                        <webhook_id translate="label comment">
+                            <label>Webhook ID</label>
+                            <frontend_type>text</frontend_type>
+                            <config_path>maho_revolut/credentials/webhook_id</config_path>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>Populated automatically by the "Register Webhook" button. Identifies the webhook for future rotation or deletion.</comment>
+                        </webhook_id>
+                        <register_webhook translate="label comment">
+                            <label>Register Webhook</label>
+                            <frontend_type>button</frontend_type>
+                            <frontend_model>maho_revolut/adminhtml_system_config_registerWebhook</frontend_model>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment><![CDATA[Save the API Key first, then click this button. It POSTs to <code>/api/1.0/webhooks</code>, registers <code>&lt;your-store&gt;/revolut/webhook</code> for the relevant order events, and saves the returned signing secret &amp; webhook ID into the fields above.]]></comment>
+                        </register_webhook>
                     </fields>
                 </maho_revolut_credentials>
 

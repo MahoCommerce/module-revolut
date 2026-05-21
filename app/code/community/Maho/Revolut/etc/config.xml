@@ -48,6 +48,18 @@
         </jobs>
     </crontab>
 
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <Maho_Revolut before="Mage_Adminhtml">Maho_Revolut_Adminhtml</Maho_Revolut>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
+
     <frontend>
         <routers>
             <revolut>
@@ -79,6 +91,7 @@
                 <sandbox>1</sandbox>
                 <api_key backend_model="adminhtml/system_config_backend_encrypted"/>
                 <webhook_secret backend_model="adminhtml/system_config_backend_encrypted"/>
+                <webhook_id></webhook_id>
             </credentials>
         </maho_revolut>
         <payment>

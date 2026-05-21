@@ -1,0 +1,67 @@
+<?php
+
+/**
+ * Maho
+ *
+ * @package    Maho_Revolut
+ * @copyright  Copyright (c) 2026 Maho (https://mahocommerce.com)
+ * @license    https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+/** @var Maho_Revolut_Block_Adminhtml_System_Config_RegisterWebhook $this */
+$htmlId = htmlspecialchars((string) $this->getData('element')->getHtmlId(), ENT_QUOTES, 'UTF-8');
+$ajaxUrl = htmlspecialchars((string) $this->getData('ajax_url'), ENT_QUOTES, 'UTF-8');
+$label = htmlspecialchars((string) $this->__('Register Webhook'), ENT_QUOTES, 'UTF-8');
+?>
+<button id="<?= $htmlId ?>_button" type="button" class="scalable"
+    data-ajax-url="<?= $ajaxUrl ?>"
+    onclick="mahoRevolutRegisterWebhook(this)">
+    <span><?= $label ?></span>
+</button>
+<span id="<?= $htmlId ?>_result" style="margin-left: 10px;"></span>
+
+<script>
+(function () {
+    if (window.mahoRevolutRegisterWebhook) {
+        return;
+    }
+    window.mahoRevolutRegisterWebhook = async function (button) {
+        const url = button.dataset.ajaxUrl;
+        const resultSpan = button.nextElementSibling;
+        button.disabled = true;
+        resultSpan.textContent = 'Registering...';
+        resultSpan.style.color = '';
+
+        const params = new URLSearchParams();
+        params.set('sandbox', document.getElementById('maho_revolut_credentials_sandbox')?.value ?? '');
+        params.set('api_key', document.getElementById('maho_revolut_credentials_api_key')?.value ?? '');
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('website')) params.set('website', urlParams.get('website'));
+        if (urlParams.get('store')) params.set('store', urlParams.get('store'));
+
+        try {
+            const response = await mahoFetch(url, { method: 'POST', body: params });
+            resultSpan.textContent = response.message;
+            resultSpan.style.color = response.success ? 'green' : 'red';
+
+            if (response.success) {
+                const webhookIdField = document.getElementById('maho_revolut_credentials_webhook_id');
+                if (webhookIdField && response.webhook_id) {
+                    webhookIdField.value = response.webhook_id;
+                }
+                const secretField = document.getElementById('maho_revolut_credentials_webhook_secret');
+                if (secretField) {
+                    secretField.value = '';
+                    secretField.placeholder = '✓ saved';
+                }
+            }
+        } catch (error) {
+            resultSpan.textContent = 'Request failed: ' + error.message;
+            resultSpan.style.color = 'red';
+        } finally {
+            button.disabled = false;
+        }
+    };
+})();
+</script>

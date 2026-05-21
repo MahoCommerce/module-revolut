@@ -13,6 +13,8 @@ declare(strict_types=1);
 class Maho_Revolut_Model_Api
 {
     protected ?int $_storeId = null;
+    protected ?string $_explicitApiKey = null;
+    protected ?bool $_explicitSandbox = null;
 
     public function __construct(array $args = [])
     {
@@ -24,6 +26,18 @@ class Maho_Revolut_Model_Api
     public function setStoreId(int $storeId): self
     {
         $this->_storeId = $storeId;
+        return $this;
+    }
+
+    /**
+     * Override credentials read from store config. Used by the admin "Register
+     * Webhook" button so a user can register a webhook before saving the form.
+     */
+    public function setExplicitCredentials(#[\SensitiveParameter]
+    string $apiKey, bool $sandbox): self
+    {
+        $this->_explicitApiKey = $apiKey;
+        $this->_explicitSandbox = $sandbox;
         return $this;
     }
 
@@ -82,9 +96,27 @@ class Maho_Revolut_Model_Api
     }
 
     /**
+     * Create a webhook. Returns the parsed response, which includes the
+     * `id` and the `signing_secret` (returned only at creation).
+     *
+     * @param list<string> $events
      * @return array<string, mixed>
      * @throws Mage_Core_Exception
      */
+    public function createWebhook(string $url, array $events): array
+    {
+        $response = $this->_request('POST', '/api/1.0/webhooks', [
+            'url' => $url,
+            'events' => array_values($events),
+        ]);
+        if (!isset($response['signing_secret']) || !isset($response['id'])) {
+            Mage::throwException(
+                $this->_getHelper()->__('Revolut: webhook created but response missing id/signing_secret: %s', json_encode($response)),
+            );
+        }
+        return $response;
+    }
+
     public function refundOrder(string $orderId, int $amountMinor, string $currency, ?string $reason = null): array
     {
         $body = [
@@ -106,10 +138,11 @@ class Maho_Revolut_Model_Api
     protected function _request(string $method, string $endpoint, array $body = []): array
     {
         $helper = $this->_getHelper();
-        $baseUrl = $helper->getApiBaseUrl($this->_storeId);
+        $sandbox = $this->_explicitSandbox ?? $helper->isSandbox($this->_storeId);
+        $baseUrl = $sandbox ? Maho_Revolut_Helper_Data::API_URL_SANDBOX : Maho_Revolut_Helper_Data::API_URL_LIVE;
         $url = $baseUrl . $endpoint;
 
-        $apiKey = $helper->getApiKey($this->_storeId);
+        $apiKey = $this->_explicitApiKey ?? $helper->getApiKey($this->_storeId);
         if ($apiKey === '') {
             Mage::throwException($helper->__('Revolut API error: %s', $helper->__('Merchant API key is not configured.')));
         }
