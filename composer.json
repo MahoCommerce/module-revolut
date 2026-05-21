@@ -4,11 +4,14 @@
     "license": "OSL-3.0",
     "type": "maho-module",
     "require": {
-        "php": ">=8.3"
+        "php": ">=8.3",
+        "mahocommerce/maho": "dev-main"
     },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "require-dev": {
         "friendsofphp/php-cs-fixer": "*",
-        "mahocommerce/maho": "*",
+        "mahocommerce/maho": "dev-main",
         "mahocommerce/maho-phpstan-plugin": "*",
         "phpstan/phpstan": "*",
         "phpstan/phpstan-deprecation-rules": "*",

@@ -21,6 +21,7 @@ class Maho_Revolut_Adminhtml_Revolut_ConfigController extends Mage_Adminhtml_Con
         'ORDER_PAYMENT_FAILED',
     ];
 
+    #[Maho\Config\Route('/admin/revolut_config/registerWebhook')]
     public function registerWebhookAction(): void
     {
         $result = ['success' => false, 'message' => ''];
