@@ -29,6 +29,7 @@ class Maho_Revolut_WebhookController extends Mage_Core_Controller_Front_Action
      * We verify the HMAC signature, look up the order, then re-fetch the canonical
      * state from Revolut before updating Maho — never trust the webhook body alone.
      */
+    #[Maho\Config\Route('/revolut/webhook', methods: ['POST'])]
     public function indexAction(): void
     {
         if (!$this->getRequest()->isPost()) {

@@ -15,6 +15,7 @@ class Maho_Revolut_PaymentController extends Mage_Core_Controller_Front_Action
     /**
      * Create the Revolut order and redirect the customer to Revolut's hosted page.
      */
+    #[Maho\Config\Route('/revolut/payment/redirect')]
     public function redirectAction(): void
     {
         $session = Mage::getSingleton('checkout/session');
@@ -67,6 +68,7 @@ class Maho_Revolut_PaymentController extends Mage_Core_Controller_Front_Action
      * but we re-fetch the order to handle the case where the webhook hasn't
      * landed yet.
      */
+    #[Maho\Config\Route('/revolut/payment/success')]
     public function successAction(): void
     {
         $session = Mage::getSingleton('checkout/session');
@@ -90,6 +92,7 @@ class Maho_Revolut_PaymentController extends Mage_Core_Controller_Front_Action
     /**
      * Customer cancelled on Revolut's side.
      */
+    #[Maho\Config\Route('/revolut/payment/cancel')]
     public function cancelAction(): void
     {
         $session = Mage::getSingleton('checkout/session');

@@ -16,6 +16,7 @@ class Maho_Revolut_Model_Cron
      * Catch orders stuck in pending_payment (e.g. webhook never arrived) and
      * reconcile them against Revolut's view of the order.
      */
+    #[Maho\Config\CronJob(id: 'maho_revolut_check_pending_payments', schedule: '*/5 * * * *')]
     public function checkPendingPayments(): void
     {
         $orders = Mage::getModel('sales/order')->getCollection()

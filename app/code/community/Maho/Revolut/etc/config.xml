@@ -35,29 +35,7 @@
         </helpers>
     </global>
 
-    <crontab>
-        <jobs>
-            <maho_revolut_check_pending_payments>
-                <schedule>
-                    <cron_expr>*/5 * * * *</cron_expr>
-                </schedule>
-                <run>
-                    <model>maho_revolut/cron::checkPendingPayments</model>
-                </run>
-            </maho_revolut_check_pending_payments>
-        </jobs>
-    </crontab>
-
     <frontend>
-        <routers>
-            <revolut>
-                <use>standard</use>
-                <args>
-                    <module>Maho_Revolut</module>
-                    <frontName>revolut</frontName>
-                </args>
-            </revolut>
-        </routers>
         <secure_url>
             <maho_revolut_payment>/revolut/payment</maho_revolut_payment>
             <maho_revolut_webhook>/revolut/webhook</maho_revolut_webhook>
