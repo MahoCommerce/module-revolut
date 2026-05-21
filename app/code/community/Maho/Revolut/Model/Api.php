@@ -34,7 +34,7 @@ class Maho_Revolut_Model_Api
      * Webhook" button so a user can register a webhook before saving the form.
      */
     public function setExplicitCredentials(#[\SensitiveParameter]
-    string $apiKey, bool $sandbox): self
+        string $apiKey, bool $sandbox): self
     {
         $this->_explicitApiKey = $apiKey;
         $this->_explicitSandbox = $sandbox;
