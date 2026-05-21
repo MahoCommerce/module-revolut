@@ -33,8 +33,8 @@ $label = htmlspecialchars((string) $this->__('Register Webhook'), ENT_QUOTES, 'U
         resultSpan.style.color = '';
 
         const params = new URLSearchParams();
-        params.set('sandbox', document.getElementById('maho_revolut_credentials_sandbox')?.value ?? '');
-        params.set('api_key', document.getElementById('maho_revolut_credentials_api_key')?.value ?? '');
+        params.set('sandbox', document.getElementById('payment_maho_revolut_credentials_sandbox')?.value ?? '');
+        params.set('api_key', document.getElementById('payment_maho_revolut_credentials_api_key')?.value ?? '');
 
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('website')) params.set('website', urlParams.get('website'));
@@ -44,18 +44,6 @@ $label = htmlspecialchars((string) $this->__('Register Webhook'), ENT_QUOTES, 'U
             const response = await mahoFetch(url, { method: 'POST', body: params });
             resultSpan.textContent = response.message;
             resultSpan.style.color = response.success ? 'green' : 'red';
-
-            if (response.success) {
-                const webhookIdField = document.getElementById('maho_revolut_credentials_webhook_id');
-                if (webhookIdField && response.webhook_id) {
-                    webhookIdField.value = response.webhook_id;
-                }
-                const secretField = document.getElementById('maho_revolut_credentials_webhook_secret');
-                if (secretField) {
-                    secretField.value = '';
-                    secretField.placeholder = '✓ saved';
-                }
-            }
         } catch (error) {
             resultSpan.textContent = 'Request failed: ' + error.message;
             resultSpan.style.color = 'red';

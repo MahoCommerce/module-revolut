@@ -31,25 +31,14 @@ class Maho_Revolut_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function getApiKey(?int $storeId = null): string
     {
-        return $this->_decryptConfig('maho_revolut/credentials/api_key', $storeId);
+        $value = (string) Mage::getStoreConfig('maho_revolut/credentials/api_key', $storeId);
+        return $value === '' ? '' : (string) Mage::helper('core')->decrypt($value);
     }
 
     public function getWebhookSecret(?int $storeId = null): string
     {
-        return $this->_decryptConfig('maho_revolut/credentials/webhook_secret', $storeId);
-    }
-
-    /**
-     * Read an encrypted credential, tolerating plaintext storage (e.g. from an
-     * older install where the encrypted backend_model didn't take).
-     */
-    protected function _decryptConfig(string $path, ?int $storeId): string
-    {
-        $value = (string) Mage::getStoreConfig($path, $storeId);
-        if ($value === '') {
-            return '';
-        }
-        return Mage::helper('core')->tryDecrypt($value) ?? $value;
+        $value = (string) Mage::getStoreConfig('maho_revolut/credentials/webhook_secret', $storeId);
+        return $value === '' ? '' : (string) Mage::helper('core')->decrypt($value);
     }
 
     public function hasCredentials(?int $storeId = null): bool
