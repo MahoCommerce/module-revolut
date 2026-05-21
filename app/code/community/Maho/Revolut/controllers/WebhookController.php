@@ -104,6 +104,28 @@ class Maho_Revolut_WebhookController extends Mage_Core_Controller_Front_Action
                 }
             }
         }
+
+        // Fallback: some webhook events arrive without merchant_order_ext_ref.
+        // Match on the revolut_order_id we stored at order-create time.
+        if ($revolutOrderId !== '') {
+            /** @var Mage_Sales_Model_Resource_Order_Collection $collection */
+            $collection = Mage::getResourceModel('sales/order_collection');
+            $collection->getSelect()->join(
+                ['p' => $collection->getTable('sales/order_payment')],
+                'main_table.entity_id = p.parent_id',
+                [],
+            )->where('p.method = ?', 'revolut_pay')
+             ->where('p.additional_information LIKE ?', '%' . $revolutOrderId . '%')
+             ->limit(10);
+
+            foreach ($collection as $order) {
+                $payment = $order->getPayment();
+                if ($payment && (string) $payment->getAdditionalInformation('revolut_order_id') === $revolutOrderId) {
+                    return $order;
+                }
+            }
+        }
+
         return null;
     }
 
