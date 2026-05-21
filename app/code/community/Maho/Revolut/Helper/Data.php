@@ -96,7 +96,10 @@ class Maho_Revolut_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * Revolut signs the payload as `v1.{timestamp}.{rawBody}` with HMAC-SHA256
      * using the per-webhook signing secret, and sends it as `Revolut-Signature: v1=<hex>`
-     * with `Revolut-Request-Timestamp: <unix-milliseconds>`.
+     * with `Revolut-Request-Timestamp: <unix-milliseconds>`. We don't enforce a
+     * staleness window -- the HMAC authenticates the payload and the webhook
+     * controller is idempotent (only pending orders transition), so a replay is
+     * a no-op.
      */
     public function verifyWebhookSignature(
         string $rawBody,
@@ -108,17 +111,10 @@ class Maho_Revolut_Helper_Data extends Mage_Core_Helper_Abstract
             return false;
         }
 
-        // Reject replays older than 5 minutes. Revolut's timestamp is in ms (13 digits)
-        // -- compare in ms so the staleness window is actually 5 minutes.
-        $timestampMs = (int) $timestampHeader;
-        if ($timestampMs <= 0 || abs((int) (microtime(true) * 1000) - $timestampMs) > 300_000) {
-            return false;
-        }
-
         $payload = 'v1.' . $timestampHeader . '.' . $rawBody;
         $expected = 'v1=' . hash_hmac('sha256', $payload, $signingSecret);
 
-        // Header may contain multiple comma-separated signatures (rotation).
+        // Header may contain multiple comma-separated signatures (rotation overlap).
         foreach (array_map('trim', explode(',', $signatureHeader)) as $candidate) {
             if (hash_equals($expected, $candidate)) {
                 return true;
