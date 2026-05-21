@@ -34,14 +34,48 @@ Click the eye icon and copy the full `sk_...` secret.
 
 ### 2. Create a webhook
 
-In the same dashboard, go to:
+> [!NOTE]
+> The Revolut Merchant dashboard does **not** have a Webhooks UI. Webhooks are created via the API and the signing secret is returned **only once**, in the create response.
 
-**Merchant → APIs → Merchant API** tab → scroll to **Webhooks** → **Add webhook** (or **Set up webhook**).
+Run this from your terminal, replacing `<sk_...>` with the secret key from step 1 and `<your-store>` with your store's public HTTPS hostname (use ngrok / Cloudflare Tunnel for local dev):
 
-- **URL** — `https://<your-store>/revolut/webhook` (must be HTTPS and publicly reachable; for local dev use ngrok / Cloudflare Tunnel).
-- **Events** — at minimum: `ORDER_COMPLETED`, `ORDER_AUTHORISED`, `ORDER_CANCELLED`, `ORDER_PAYMENT_FAILED`. Selecting all order events is also safe — the module re-fetches the order and only acts on states it recognises.
+**Sandbox**
+```bash
+curl -X POST https://sandbox-merchant.revolut.com/api/1.0/webhooks \
+  -H "Authorization: Bearer <sk_...>" \
+  -H "Revolut-Api-Version: 2024-09-01" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://<your-store>/revolut/webhook",
+    "events": [
+      "ORDER_COMPLETED",
+      "ORDER_AUTHORISED",
+      "ORDER_PAYMENT_DECLINED",
+      "ORDER_PAYMENT_FAILED"
+    ]
+  }'
+```
 
-After saving, Revolut shows the **signing secret once** — copy it.
+**Production**: swap the host to `https://merchant.revolut.com` and use your production secret key.
+
+The response looks like:
+
+```json
+{
+  "id": "wh_...",
+  "url": "https://<your-store>/revolut/webhook",
+  "events": ["ORDER_COMPLETED", "ORDER_AUTHORISED", ...],
+  "signing_secret": "wsk_..."
+}
+```
+
+Copy the `signing_secret` — you'll paste it into Maho in step 3.
+
+To **list / rotate / delete** webhooks later:
+- `GET /api/1.0/webhooks` — list all
+- `GET /api/1.0/webhooks/{id}` — retrieve one (also returns `signing_secret`)
+- `POST /api/1.0/webhooks/{id}/rotate-signing-secret` — rotate the secret
+- `DELETE /api/1.0/webhooks/{id}` — delete
 
 ### 3. Configure Maho
 

@@ -51,7 +51,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <comment><![CDATA[In the same Revolut dashboard go to <b>Merchant &rarr; APIs &rarr; Merchant API &rarr; Webhooks</b> and add a webhook pointing to <code>&lt;your-store&gt;/revolut/webhook</code>. Subscribe to at least <code>ORDER_COMPLETED</code>, <code>ORDER_AUTHORISED</code>, <code>ORDER_CANCELLED</code>, <code>ORDER_PAYMENT_FAILED</code>. Revolut shows the signing secret once after saving — paste it here.]]></comment>
+                            <comment><![CDATA[The Revolut Merchant dashboard has no Webhooks UI &mdash; create one via API. Run <code>curl -X POST https://sandbox-merchant.revolut.com/api/1.0/webhooks -H "Authorization: Bearer &lt;sk_...&gt;" -H "Revolut-Api-Version: 2024-09-01" -H "Content-Type: application/json" -d '{"url":"https://&lt;your-store&gt;/revolut/webhook","events":["ORDER_COMPLETED","ORDER_AUTHORISED","ORDER_PAYMENT_DECLINED","ORDER_PAYMENT_FAILED"]}'</code> (swap host to <code>merchant.revolut.com</code> for production). Copy the <code>signing_secret</code> from the response &mdash; it is returned only once.]]></comment>
                         </webhook_secret>
                     </fields>
                 </maho_revolut_credentials>
