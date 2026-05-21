@@ -72,11 +72,6 @@ class Maho_Revolut_Model_Method_RevolutPay extends Mage_Payment_Model_Method_Abs
             Mage::throwException($helper->__('No payment found for order.'));
         }
 
-        $billing = $order->getBillingAddress();
-        if (!$billing) {
-            Mage::throwException($helper->__('No billing address found for order.'));
-        }
-
         $currency = (string) $order->getBaseCurrencyCode();
         $amountMinor = $helper->toMinorUnits((float) $order->getBaseGrandTotal(), $currency);
 
@@ -84,10 +79,12 @@ class Maho_Revolut_Model_Method_RevolutPay extends Mage_Payment_Model_Method_Abs
             ? 'manual'
             : 'automatic';
 
-        /** @var array<string> $street */
-        $street = $billing->getStreet();
-
-        $data = [
+        // Per Revolut's hosted-checkout guide, only amount/currency are required;
+        // description / customer.email / redirect_url / merchant_order_ext_ref are
+        // the documented useful optionals. We deliberately don't send customer.full_name
+        // or a shipping payload here -- Revolut collects buyer details on the hosted
+        // page and the official Magento 2 module follows the same minimal-create pattern.
+        $data = array_filter([
             'amount' => $amountMinor,
             'currency' => strtoupper($currency),
             'capture_mode' => $captureMode,
@@ -95,20 +92,9 @@ class Maho_Revolut_Model_Method_RevolutPay extends Mage_Payment_Model_Method_Abs
             'description' => $helper->__('Order #%s', $order->getIncrementId()),
             'customer' => array_filter([
                 'email' => $order->getCustomerEmail(),
-                'full_name' => trim($billing->getFirstname() . ' ' . $billing->getLastname()),
             ]),
             'redirect_url' => Mage::getUrl('revolut/payment/success', ['_secure' => true]),
-            'shipping' => [
-                'address' => array_filter([
-                    'street_line_1' => $street[0] ?? '',
-                    'street_line_2' => $street[1] ?? '',
-                    'city' => $billing->getCity(),
-                    'region' => $billing->getRegion(),
-                    'country_code' => $billing->getCountryId(),
-                    'postcode' => $billing->getPostcode(),
-                ]),
-            ],
-        ];
+        ]);
 
         $result = $this->_getApi($storeId)->createOrder($data);
 
