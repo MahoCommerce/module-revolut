@@ -21,18 +21,40 @@ composer require mahocommerce/module-revolut
 
 ## Configuration
 
-1. In your Revolut Merchant dashboard, generate a **Merchant API key** (sandbox or production).
-2. In Maho admin, go to **System → Configuration → Sales → Payment Methods**.
-3. Under **Revolut — General Settings**, set:
-   - **Sandbox Mode** — on while testing, off in production
-   - **Merchant API Key** — paste the secret key from Revolut
-   - **Webhook Signing Secret** — see step 4
-4. Create a webhook in the Revolut dashboard pointing at:
-   ```
-   https://<your-store>/revolut/webhook
-   ```
-   Paste the resulting signing secret into the field above. Subscribe to at least: `ORDER_COMPLETED`, `ORDER_AUTHORISED`, `ORDER_CANCELLED`, `PAYMENT_FAILED`.
-5. Under **Revolut Pay**, set the method to **Enabled** and pick a Title/Sort Order.
+### 1. Get the Merchant API key
+
+In your Revolut Business dashboard — production at <https://business.revolut.com>, sandbox at <https://sandbox-business.revolut.com> — go to:
+
+**Merchant → APIs → Merchant API** tab → **API Keys → Sandbox API Secret key** (or *Production API Secret key* when going live).
+
+Click the eye icon and copy the full `sk_...` secret.
+
+> [!IMPORTANT]
+> Make sure you are on the **Merchant API** tab, **not** *Business API*. The Business API needs OAuth + JWT + certificates; this module does not use it. The **Public key** (`pk_...`) shown on the same screen is unused by v1 (redirect checkout, no JS widget) — ignore it.
+
+### 2. Create a webhook
+
+In the same dashboard, go to:
+
+**Merchant → APIs → Merchant API** tab → scroll to **Webhooks** → **Add webhook** (or **Set up webhook**).
+
+- **URL** — `https://<your-store>/revolut/webhook` (must be HTTPS and publicly reachable; for local dev use ngrok / Cloudflare Tunnel).
+- **Events** — at minimum: `ORDER_COMPLETED`, `ORDER_AUTHORISED`, `ORDER_CANCELLED`, `ORDER_PAYMENT_FAILED`. Selecting all order events is also safe — the module re-fetches the order and only acts on states it recognises.
+
+After saving, Revolut shows the **signing secret once** — copy it.
+
+### 3. Configure Maho
+
+In Maho admin → **System → Configuration → Sales → Payment Methods**:
+
+Under **Revolut — General Settings**:
+- **Sandbox Mode** — on while testing, off in production
+- **Merchant API Key** — the `sk_...` from step 1
+- **Webhook Signing Secret** — the secret from step 2
+
+Under **Revolut — Revolut Pay**:
+- **Enabled** — Yes
+- **Title / Sort Order / Payment Action** — to taste (Authorize Only vs. Authorize and Capture)
 
 ## Development
 
