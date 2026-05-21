@@ -85,7 +85,7 @@
                         <payment_action translate="label">
                             <label>Payment Action</label>
                             <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_payment_action</source_model>
+                            <source_model>maho_revolut/system_config_source_paymentAction</source_model>
                             <config_path>payment/revolut_pay/payment_action</config_path>
                             <sort_order>30</sort_order>
                             <show_in_default>1</show_in_default>
