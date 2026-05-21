@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Maho
+ *
+ * @package    Maho_Revolut
+ * @copyright  Copyright (c) 2026 Maho (https://mahocommerce.com)
+ * @license    https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+-->
+<config>
+    <modules>
+        <Maho_Revolut>
+            <version>1.0.0</version>
+        </Maho_Revolut>
+    </modules>
+
+    <global>
+        <models>
+            <maho_revolut>
+                <class>Maho_Revolut_Model</class>
+            </maho_revolut>
+        </models>
+
+        <blocks>
+            <maho_revolut>
+                <class>Maho_Revolut_Block</class>
+            </maho_revolut>
+        </blocks>
+
+        <helpers>
+            <maho_revolut>
+                <class>Maho_Revolut_Helper</class>
+            </maho_revolut>
+        </helpers>
+    </global>
+
+    <crontab>
+        <jobs>
+            <maho_revolut_check_pending_payments>
+                <schedule>
+                    <cron_expr>*/5 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>maho_revolut/cron::checkPendingPayments</model>
+                </run>
+            </maho_revolut_check_pending_payments>
+        </jobs>
+    </crontab>
+
+    <frontend>
+        <routers>
+            <revolut>
+                <use>standard</use>
+                <args>
+                    <module>Maho_Revolut</module>
+                    <frontName>revolut</frontName>
+                </args>
+            </revolut>
+        </routers>
+        <secure_url>
+            <maho_revolut_payment>/revolut/payment</maho_revolut_payment>
+            <maho_revolut_webhook>/revolut/webhook</maho_revolut_webhook>
+        </secure_url>
+        <translate>
+            <modules>
+                <Maho_Revolut>
+                    <files>
+                        <default>Maho_Revolut.csv</default>
+                    </files>
+                </Maho_Revolut>
+            </modules>
+        </translate>
+    </frontend>
+
+    <default>
+        <maho_revolut>
+            <credentials>
+                <sandbox>1</sandbox>
+                <api_key backend_model="adminhtml/system_config_backend_encrypted"/>
+                <webhook_secret backend_model="adminhtml/system_config_backend_encrypted"/>
+            </credentials>
+        </maho_revolut>
+        <payment>
+            <revolut_pay>
+                <active>0</active>
+                <model>maho_revolut/method_revolutPay</model>
+                <title>Revolut Pay</title>
+                <payment_action>authorize_capture</payment_action>
+                <group>revolut</group>
+                <allowspecific>0</allowspecific>
+                <sort_order>100</sort_order>
+            </revolut_pay>
+        </payment>
+    </default>
+</config>

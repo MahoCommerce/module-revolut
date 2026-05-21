@@ -1,6 +1,6 @@
 {
-    "name": "mahocommerce/module-NAME",
-    "description": "TODO: short description of what this module does",
+    "name": "mahocommerce/module-revolut",
+    "description": "Revolut payment gateway integration for Maho",
     "license": "OSL-3.0",
     "type": "maho-module",
     "require": {
