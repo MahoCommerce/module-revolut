@@ -80,6 +80,7 @@
                 <api_key backend_model="adminhtml/system_config_backend_encrypted"/>
                 <webhook_secret backend_model="adminhtml/system_config_backend_encrypted"/>
                 <webhook_id></webhook_id>
+                <debug>0</debug>
             </credentials>
         </maho_revolut>
         <payment>

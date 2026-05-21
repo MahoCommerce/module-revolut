@@ -42,11 +42,14 @@ class Maho_Revolut_WebhookController extends Mage_Core_Controller_Front_Action
             return;
         }
 
+        /** @var Maho_Revolut_Helper_Data $helper */
+        $helper = Mage::helper('maho_revolut');
+
         try {
             /** @var array<string, mixed> $data */
             $data = (array) Mage::helper('core')->jsonDecode($body);
         } catch (\Throwable $e) {
-            Mage::log('Revolut webhook: invalid JSON body', Mage::LOG_WARNING, 'revolut.log');
+            $helper->log('Revolut webhook: invalid JSON body', Mage::LOG_WARNING);
             $this->getResponse()->setHttpResponseCode(400);
             return;
         }
@@ -57,10 +60,9 @@ class Maho_Revolut_WebhookController extends Mage_Core_Controller_Front_Action
 
         $order = $this->_findOrder($extRef, $revolutOrderId);
         if (!$order) {
-            Mage::log(
+            $helper->log(
                 "Revolut webhook: no order found for ext_ref={$extRef} revolut_order_id={$revolutOrderId}",
                 Mage::LOG_WARNING,
-                'revolut.log',
             );
             $this->getResponse()->setHttpResponseCode(404);
             return;
@@ -68,18 +70,14 @@ class Maho_Revolut_WebhookController extends Mage_Core_Controller_Front_Action
 
         $storeId = (int) $order->getStoreId();
 
-        /** @var Maho_Revolut_Helper_Data $helper */
-        $helper = Mage::helper('maho_revolut');
-
         $signatureHeader = (string) $this->getRequest()->getHeader('Revolut-Signature');
         $timestampHeader = (string) $this->getRequest()->getHeader('Revolut-Request-Timestamp');
         $signingSecret = $helper->getWebhookSecret($storeId);
 
         if (!$helper->verifyWebhookSignature($body, $signatureHeader, $timestampHeader, $signingSecret)) {
-            Mage::log(
+            $helper->log(
                 "Revolut webhook: signature verification failed for order #{$order->getIncrementId()}",
                 Mage::LOG_WARNING,
-                'revolut.log',
             );
             $this->getResponse()->setHttpResponseCode(401);
             return;
@@ -136,41 +134,25 @@ class Maho_Revolut_WebhookController extends Mage_Core_Controller_Front_Action
                 if ($order->getState() === Mage_Sales_Model_Order::STATE_PENDING_PAYMENT) {
                     $payment->registerCaptureNotification($amount);
                     $order->save();
-                    Mage::log(
-                        "Revolut webhook: captured order #{$order->getIncrementId()} ({$event})",
-                        Mage::LOG_INFO,
-                        'revolut.log',
-                    );
+                    $helper->log("Revolut webhook: captured order #{$order->getIncrementId()} ({$event})", Mage::LOG_INFO);
                 }
                 break;
             case 'AUTHORISED':
                 if ($order->getState() === Mage_Sales_Model_Order::STATE_PENDING_PAYMENT) {
                     $payment->registerAuthorizationNotification($amount);
                     $order->save();
-                    Mage::log(
-                        "Revolut webhook: authorised order #{$order->getIncrementId()} ({$event})",
-                        Mage::LOG_INFO,
-                        'revolut.log',
-                    );
+                    $helper->log("Revolut webhook: authorised order #{$order->getIncrementId()} ({$event})", Mage::LOG_INFO);
                 }
                 break;
             case 'FAILED':
             case 'CANCELLED':
                 if ($order->canCancel()) {
                     $order->cancel()->save();
-                    Mage::log(
-                        "Revolut webhook: cancelled order #{$order->getIncrementId()} ({$event})",
-                        Mage::LOG_INFO,
-                        'revolut.log',
-                    );
+                    $helper->log("Revolut webhook: cancelled order #{$order->getIncrementId()} ({$event})", Mage::LOG_INFO);
                 }
                 break;
             default:
-                Mage::log(
-                    "Revolut webhook: ignoring state={$state} for order #{$order->getIncrementId()}",
-                    Mage::LOG_INFO,
-                    'revolut.log',
-                );
+                $helper->log("Revolut webhook: ignoring state={$state} for order #{$order->getIncrementId()}", Mage::LOG_INFO);
         }
     }
 }

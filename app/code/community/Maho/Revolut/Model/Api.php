@@ -161,6 +161,10 @@ class Maho_Revolut_Model_Api
             $options['body'] = json_encode($body, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         }
 
+        if ($helper->isLogEnabled($this->_storeId)) {
+            $helper->log("--> {$method} {$endpoint} " . ($options['body'] ?? ''), Mage::LOG_DEBUG);
+        }
+
         try {
             $client = \Symfony\Component\HttpClient\HttpClient::create();
             $response = $client->request($method, $url, $options);
@@ -169,22 +173,24 @@ class Maho_Revolut_Model_Api
             /** @var array<string, mixed> $result */
             $result = $content === '' ? [] : (array) Mage::helper('core')->jsonDecode($content);
 
+            if ($helper->isLogEnabled($this->_storeId)) {
+                $helper->log("<-- {$method} {$endpoint} {$statusCode} {$content}", Mage::LOG_DEBUG);
+            }
+
             if ($statusCode >= 400) {
                 $errorMsg = $result['message'] ?? $result['error'] ?? "HTTP {$statusCode}";
-                Mage::log(
+                $helper->log(
                     "Revolut API error: {$method} {$endpoint} -> {$statusCode}: {$content}",
                     Mage::LOG_ERROR,
-                    'revolut.log',
                 );
                 Mage::throwException($helper->__('Revolut API error: %s', (string) $errorMsg));
             }
 
             return $result;
         } catch (\Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface $e) {
-            Mage::log(
+            $helper->log(
                 "Revolut API transport error: {$method} {$endpoint} -> {$e->getMessage()}",
                 Mage::LOG_ERROR,
-                'revolut.log',
             );
             Mage::throwException($helper->__('Revolut connection error: %s', $e->getMessage()));
         }

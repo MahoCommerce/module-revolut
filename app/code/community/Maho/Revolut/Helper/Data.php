@@ -24,6 +24,21 @@ class Maho_Revolut_Helper_Data extends Mage_Core_Helper_Abstract
         return Mage::getStoreConfigFlag('maho_revolut/credentials/sandbox', $storeId);
     }
 
+    public function isLogEnabled(?int $storeId = null): bool
+    {
+        return Mage::getStoreConfigFlag('maho_revolut/credentials/debug', $storeId);
+    }
+
+    /**
+     * Write a line to var/log/revolut.log. Bypasses the global dev/log/active
+     * flag when the module's own debug option is on, so users can capture
+     * traffic without flipping logging globally.
+     */
+    public function log(string $message, Monolog\Level|int|null $level = null): void
+    {
+        Mage::log($message, $level, 'revolut.log', $this->isLogEnabled());
+    }
+
     public function getApiBaseUrl(?int $storeId = null): string
     {
         return $this->isSandbox($storeId) ? self::API_URL_SANDBOX : self::API_URL_LIVE;
