@@ -175,7 +175,7 @@ class Maho_Revolut_WebhookController extends Mage_Core_Controller_Front_Action
                 }
                 break;
             default:
-                $helper->log("Revolut webhook: ignoring state={$state} for order #{$order->getIncrementId()}", Mage::LOG_INFO);
+                $helper->log("Revolut webhook: ignoring event={$event} state={$state} for order #{$order->getIncrementId()}", Mage::LOG_INFO);
         }
     }
 }
