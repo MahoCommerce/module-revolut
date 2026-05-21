@@ -1,0 +1,23 @@
+{
+    "name": "mahocommerce/module-NAME",
+    "description": "TODO: short description of what this module does",
+    "license": "OSL-3.0",
+    "type": "maho-module",
+    "require": {
+        "php": ">=8.3"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "*",
+        "mahocommerce/maho": "*",
+        "mahocommerce/maho-phpstan-plugin": "*",
+        "phpstan/phpstan": "*",
+        "phpstan/phpstan-deprecation-rules": "*",
+        "phpstan/phpstan-strict-rules": "*",
+        "rector/rector": "*"
+    },
+    "config": {
+        "allow-plugins": {
+            "mahocommerce/maho-composer-plugin": true
+        }
+    }
+}
