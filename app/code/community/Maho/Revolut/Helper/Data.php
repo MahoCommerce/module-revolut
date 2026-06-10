@@ -115,7 +115,7 @@ class Maho_Revolut_Helper_Data extends Mage_Core_Helper_Abstract
         $expected = 'v1=' . hash_hmac('sha256', $payload, $signingSecret);
 
         // Header may contain multiple comma-separated signatures (rotation overlap).
-        foreach (array_map('trim', explode(',', $signatureHeader)) as $candidate) {
+        foreach (array_map(trim(...), explode(',', $signatureHeader)) as $candidate) {
             if (hash_equals($expected, $candidate)) {
                 return true;
             }
