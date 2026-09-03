@@ -14,6 +14,25 @@ use Rector\TypeDeclaration\Rector as TypeDeclaration;
 // Maho\Rector\* rules and the Varien->Maho migration) stays in maho and is not
 // synced. Only the paths that exist in a given repo are scanned, so the one
 // config works for app-only modules and the infra tool's src/ alike.
+//
+// Existence alone is not enough: in a module repo `composer install` lets the
+// maho composer plugin materialize maho core files under public/ and lib/.
+// Those files are never tracked by the module. Some modules git-ignore them,
+// some ignore the whole directory, and some leave them untracked next to their
+// own tracked skin or js files. Rector must not lint core files a module cannot
+// change, so every path git does not track is skipped. Without
+// --exclude-standard, ls-files lists ignored files as well as plain untracked
+// ones, and --directory collapses a fully untracked directory to one entry.
+function gitUntrackedPaths(): array
+{
+    exec(
+        'git -C ' . escapeshellarg(__DIR__) . ' ls-files --others --directory 2>/dev/null',
+        $paths,
+    );
+
+    return array_map(static fn(string $path): string => __DIR__ . '/' . rtrim($path, '/'), $paths);
+}
+
 return RectorConfig::configure()
     ->withPaths(array_values(array_merge(
         array_filter([
@@ -46,6 +65,7 @@ return RectorConfig::configure()
     //
     // Everything else in the sets is a safe rewrite, so keep the derivation.
     ->withSkip([
+        ...gitUntrackedPaths(),
         Rector\Php81\Rector\Property\ReadOnlyPropertyRector::class,
         Rector\Php82\Rector\Class_\ReadOnlyClassRector::class,
         Rector\Php83\Rector\ClassConst\AddTypeToConstRector::class,
