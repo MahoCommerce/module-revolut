@@ -4,7 +4,7 @@
     "license": "OSL-3.0",
     "type": "maho-module",
     "require": {
-        "php": ">=8.3"
+        "php": ">=8.5"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -22,7 +22,7 @@
             "mahocommerce/maho-composer-plugin": true
         },
         "platform": {
-            "php": "8.3"
+            "php": "8.5"
         }
     }
 }
