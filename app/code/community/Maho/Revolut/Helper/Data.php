@@ -15,6 +15,7 @@ class Maho_Revolut_Helper_Data extends Mage_Core_Helper_Abstract
 
     public const API_VERSION = '2024-09-01';
 
+    #[\Override]
     protected $_moduleName = 'Maho_Revolut';
 
     public function isSandbox(?int $storeId = null): bool
@@ -111,13 +112,6 @@ class Maho_Revolut_Helper_Data extends Mage_Core_Helper_Abstract
 
         $payload = 'v1.' . $timestampHeader . '.' . $rawBody;
         $expected = 'v1=' . hash_hmac('sha256', $payload, $signingSecret);
-
-        // Header may contain multiple comma-separated signatures (rotation overlap).
-        foreach (array_map(trim(...), explode(',', $signatureHeader)) as $candidate) {
-            if (hash_equals($expected, $candidate)) {
-                return true;
-            }
-        }
-        return false;
+        return array_any(array_map(trim(...), explode(',', $signatureHeader)), fn($candidate) => hash_equals($expected, $candidate));
     }
 }
