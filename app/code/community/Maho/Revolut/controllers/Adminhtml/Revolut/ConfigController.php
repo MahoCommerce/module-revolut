@@ -22,7 +22,7 @@ class Maho_Revolut_Adminhtml_Revolut_ConfigController extends Mage_Adminhtml_Con
     #[Maho\Config\Route('/admin/revolut_config/registerWebhook')]
     public function registerWebhookAction(): void
     {
-        $result = ['success' => false, 'message' => ''];
+        $result = ['success' => false];
 
         try {
             $storeId = $this->_resolveStoreId();
@@ -115,7 +115,7 @@ class Maho_Revolut_Adminhtml_Revolut_ConfigController extends Mage_Adminhtml_Con
         $websiteCode = $this->getRequest()->getParam('website');
         if ($websiteCode) {
             $website = Mage::app()->getWebsite($websiteCode);
-            $defaultStore = $website !== null ? $website->getDefaultStore() : null;
+            $defaultStore = $website?->getDefaultStore();
             if ($defaultStore !== null) {
                 return (int) $defaultStore->getId();
             }
