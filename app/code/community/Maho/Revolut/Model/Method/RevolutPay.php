@@ -52,6 +52,7 @@ class Maho_Revolut_Model_Method_RevolutPay extends Mage_Payment_Model_Method_Abs
         return parent::isAvailable($quote);
     }
 
+    #[\Override]
     public function getOrderPlaceRedirectUrl(): string
     {
         return Mage::getUrl('revolut/payment/redirect', ['_secure' => true]);

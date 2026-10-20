@@ -79,7 +79,7 @@ class Maho_Revolut_PaymentController extends Mage_Core_Controller_Front_Action
                 $this->_syncOrderState($order);
                 $quote = $session->getQuote();
                 if ($quote->getId()) {
-                    $quote->setIsActive(0)->save();
+                    $quote->setIsActive(false)->save();
                 }
             }
         }
@@ -157,7 +157,7 @@ class Maho_Revolut_PaymentController extends Mage_Core_Controller_Front_Action
         }
         $quote = Mage::getModel('sales/quote')->load($order->getQuoteId());
         if ($quote->getId()) {
-            $quote->setIsActive(1)->setReservedOrderId('')->save();
+            $quote->setIsActive()->setReservedOrderId('')->save();
             Mage::getSingleton('checkout/session')->replaceQuote($quote);
         }
     }
