@@ -13,7 +13,7 @@ Maho is a Magento 1-lineage codebase, so all the usual conventions apply: `Mage:
 Run any of these from the repo root after `composer install`:
 
 ```bash
-vendor/bin/phpstan analyze                          # PHPStan level 8 (CI gate, matrix: PHP 8.3/8.4/8.5)
+vendor/bin/phpstan analyze                          # PHPStan level 8 (CI gate, matrix: PHP 8.5/8.6)
 vendor/bin/php-cs-fixer fix --diff --dry-run        # CS check (CI gate). Drop --dry-run to apply.
 vendor/bin/rector -c .rector.php --dry-run          # Rector check (CI gate). Drop --dry-run to apply.
 ```

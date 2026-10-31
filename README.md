@@ -2,14 +2,14 @@
 
 ![Maho Commerce](https://img.shields.io/badge/Maho_Commerce-module-orange)
 ![License](https://img.shields.io/badge/license-OSL--3.0-blue)
-![PHP](https://img.shields.io/badge/php-%3E%3D8.3-8892BF)
+![PHP](https://img.shields.io/badge/php-%3E%3D8.5.1-8892BF)
 ![PHPStan Level](https://img.shields.io/badge/PHPStan-level%208-brightgreen)
 
 Revolut payment gateway for [Maho Commerce](https://mahocommerce.com). The v1 ships **Revolut Pay** as a redirect checkout: the customer is sent to Revolut's hosted payment page, and the order is captured back in Maho via webhook.
 
 ## Requirements
 
-- PHP >= 8.3
+- PHP >= 8.5.1
 - Maho Commerce
 - A Revolut Business / Merchant account with API access
 
